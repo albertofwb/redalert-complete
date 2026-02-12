@@ -2,7 +2,7 @@
 # 生成红警风格测试音效
 # 为每个经典语音生成对应的音调
 
-SOUNDS_DIR="$HOME/.claude/hooks/redalert-complete/sounds"
+SOUNDS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/sounds"
 mkdir -p "$SOUNDS_DIR"
 
 echo "🎵 生成红警音效..."
