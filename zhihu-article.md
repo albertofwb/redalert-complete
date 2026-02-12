@@ -65,18 +65,48 @@ bash install.sh
 ```json
 {
   "hooks": {
-    "OnStart": [
-      "/home/albert/.claude/hooks/redalert-complete/ra-hooks.sh start"
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/albert/.claude/hooks/redalert-complete/ra-hooks.sh start"
+          }
+        ]
+      }
     ],
-    "BeforeToolUse": [
-      "/home/albert/.claude/hooks/redalert-complete/ra-hooks.sh building"
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/albert/.claude/hooks/redalert-complete/ra-hooks.sh building"
+          }
+        ]
+      }
     ],
-    "AfterToolUse": [
-      "/home/albert/.claude/hooks/redalert-complete/ra-complete.sh"
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/albert/.claude/hooks/redalert-complete/ra-complete.sh"
+          }
+        ]
+      }
     ]
   }
 }
 ```
+
+**配置说明：**
+- `SessionStart`: Claude 启动时触发
+- `PreToolUse`: 工具调用前触发（这里只匹配 `Bash` 命令）
+- `PostToolUse`: 工具调用成功后触发
+- `matcher`: `"*"` 表示匹配所有，也可用 `"Bash|Edit|Write"` 匹配特定工具
 
 ---
 
@@ -84,14 +114,18 @@ bash install.sh
 
 Claude Code 提供了 **Hooks 机制**，可以在不同节点触发自定义脚本：
 
-| Hook | 触发时机 |
-|------|---------|
-| `OnStart` | Claude 启动时 |
-| `BeforeToolUse` | 使用工具前 |
-| `AfterToolUse` | 使用工具后 |
-| `OnExit` | Claude 退出时 |
+| Hook 事件 | 触发时机 |
+|----------|---------|
+| `SessionStart` | 会话开始时 |
+| `PreToolUse` | 工具调用前 |
+| `PostToolUse` | 工具调用成功后 |
+| `PostToolUseFailure` | 工具调用失败后 |
+| `SessionEnd` | 会话结束时 |
 
-我们利用这个机制，在相应时机播放对应的音效文件。
+Claude Code 的 hooks 配置需要特定格式：
+- **`matcher`**: 正则表达式匹配触发条件，`*` 表示匹配所有
+- **`type`**: `"command"` 表示执行 shell 命令
+- **`command`**: 实际执行的命令路径
 
 ### 跨平台音频播放
 
@@ -186,7 +220,7 @@ sudo apt-get install sox
 
 ## 相关链接
 
-- [Claude Code 官方文档 - Hooks](https://docs.anthropic.com/claude/docs/claude-code-hooks)
+- [Claude Code 官方文档 - Hooks](https://code.claude.com/docs/en/hooks)
 - [peon-ping - Warcraft III 语音版](https://github.com/tonyyont/peon-ping)
 - [XCC Mixer 下载](http://xhp.xwis.net/)
 

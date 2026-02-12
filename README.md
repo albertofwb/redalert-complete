@@ -13,7 +13,7 @@
 | 场景 | 触发时机 | 经典音效 |
 |------|---------|---------|
 | 🚀 **启动** | Claude Code 启动 | *New Construction Options* |
-| 🔨 **开工** | 执行工具/命令前 | *Building...* |
+| 🔨 **开工** | 执行 Bash 命令前 | *Building...* |
 | ✅ **完成** | 任务执行成功 | *Mission Complete!* |
 | ❌ **错误** | 任务失败/出错 | *Cannot deploy here!* |
 | ⚠️ **警告** | 需要注意时 | *Building silos needed* |
@@ -52,20 +52,46 @@ bash ~/.claude/hooks/redalert-complete/generate-sounds.sh
 ```json
 {
   "hooks": {
-    "OnStart": [
-      "/home/albert/.claude/hooks/redalert-complete/ra-hooks.sh start"
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/albert/.claude/hooks/redalert-complete/ra-hooks.sh start"
+          }
+        ]
+      }
     ],
-    "BeforeToolUse": [
-      "/home/albert/.claude/hooks/redalert-complete/ra-hooks.sh building"
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/albert/.claude/hooks/redalert-complete/ra-hooks.sh building"
+          }
+        ]
+      }
     ],
-    "AfterToolUse": [
-      "/home/albert/.claude/hooks/redalert-complete/ra-complete.sh"
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/albert/.claude/hooks/redalert-complete/ra-complete.sh"
+          }
+        ]
+      }
     ]
   }
 }
 ```
 
-> 💡 注意：将路径替换为你的实际安装路径
+> 💡 **注意：**
+> - 将路径替换为你的实际安装路径
+> - `matcher` 可以使用 `"*"` 匹配所有，或 `"Bash|Edit|Write"` 匹配特定工具
 
 ## 🔊 音效文件
 
@@ -91,14 +117,22 @@ bash ~/.claude/hooks/redalert-complete/generate-sounds.sh
 
 ## 🎮 支持的 Hooks
 
-Claude Code 支持以下 hook 点：
+Claude Code 支持以下 hook 事件：
 
-| Hook | 触发时机 | 建议音效 |
-|------|---------|---------|
-| `OnStart` | Claude 启动时 | New Construction Options |
-| `BeforeToolUse` | 使用工具前 | Building |
-| `AfterToolUse` | 使用工具后 | Mission Complete |
-| `OnExit` | Claude 退出时 | （可选） |
+| Hook 事件 | 触发时机 | 建议音效 |
+|----------|---------|---------|
+| `SessionStart` | Claude 启动时 | New Construction Options |
+| `PreToolUse` | 工具调用前 | Building |
+| `PostToolUse` | 工具调用成功后 | Mission Complete |
+| `PostToolUseFailure` | 工具调用失败后 | Cannot deploy here |
+| `SessionEnd` | Claude 退出时 | （可选） |
+
+### 配置格式说明
+
+Claude Code 的 hooks 配置需要特定格式：
+- **`matcher`**: 正则匹配，`*` 表示匹配所有
+- **`type`**: `"command"` 表示执行 shell 命令
+- **`command`**: 实际执行的命令
 
 ## 🛠️ 系统要求
 
@@ -139,7 +173,7 @@ bash ~/.claude/hooks/redalert-complete/ra-hooks.sh error      # 错误
 ## 🤝 相关项目
 
 - [peon-ping](https://github.com/tonyyont/peon-ping) - Warcraft III 苦工语音版
-- [Claude Code 官方文档](https://docs.anthropic.com/claude/docs/claude-code-hooks)
+- [Claude Code 官方文档 - Hooks](https://code.claude.com/docs/en/hooks)
 
 ## 📄 许可证
 
