@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Temp files
+*.tmp
+*.swp
+*~
+
+# Audio backups
+sounds/*.bak
+
+# Claude settings (private)
+settings.json
+
+# Logs
+*.log
